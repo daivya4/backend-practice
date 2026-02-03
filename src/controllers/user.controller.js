@@ -23,9 +23,12 @@ const registerUser = asyncHandler(async (req,res) => {
     if(!avatarLocalPath){
         throw new ApiError(400,"Avatar image is required")
     }
+    console.log(req.files)
 
     const avatarUrl = await uploadOnCloudinary(avatarLocalPath)
-    const coverImageUrl = await uploadOnCloudinary(coverImageLocalPath)
+    const coverImageUrl = coverImageLocalPath 
+        ? await uploadOnCloudinary(coverImageLocalPath)
+        : null
 
     if(!avatarUrl){
         throw new ApiError(500,"Error uploading avatar image")
@@ -37,6 +40,7 @@ const registerUser = asyncHandler(async (req,res) => {
         coverImage: coverImageUrl?.url || "",
         email,
         username: username.toLowerCase(),
+        password,
     })
 
     const createdUser = await User.findById(user._id).select('-password -refreshToken')
